@@ -70,13 +70,14 @@ Ensure you have a C++ compiler (e.g., `g++`). Run:
 
 ```bash
 g++ dynamic_scheduler.cpp -o scheduler
+````
 
-2. Execution
+### 2. Execution
 
 Run the program:
-
+````
 ./scheduler
-
+````
 
 You will be prompted to either:
 
@@ -86,6 +87,7 @@ Run a predefined test case.
 
 🧪 Test Case Analysis
 Test Input
+````
 events = {
     {1, 1, 3, 100, 50, "Hall A", {}},
     {2, 2, 4, 120, 60, "Hall A", {}},
@@ -94,6 +96,7 @@ events = {
     {5, 6, 8, 180, 90, "Hall A", {}},
     {6, 9, 11, 220, 110, "Hall C", {1, 5}}
 };
+````
 
 Expected Output (Maximize Attendance)
  Maximum Attendance achievable: 500
