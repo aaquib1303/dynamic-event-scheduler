@@ -1,156 +1,90 @@
-# Dynamic Event Scheduler
+# 🧠 Dynamic Event Scheduler (C++)
 
-## 📌 Project Overview
-This project is a **dynamic event scheduler** developed in **C++**.  
-It solves the problem of finding the optimal schedule of events from a given list, considering three primary objectives:  
+## 📊 Project Overview
 
-- **Maximize Attendance**  
-- **Maximize Revenue**  
-- **Hybrid Objective** (weighted combination of both)  
+The **Dynamic Event Scheduler** is a high-performance C++ application designed to solve a complex resource allocation challenge: finding the optimal schedule of events to maximize business objectives while strictly adhering to real-world constraints.
 
-Unlike simple scheduling problems, this scheduler also incorporates **real-world constraints**:
-
-- **Multiple Venues**: Events in different venues can run simultaneously.  
-- **Dependencies**: Some events require one or more prerequisite events to be scheduled first.  
-
-The solution leverages **graph theory** and **dynamic programming** to ensure correct and efficient results.
+This project implements a sophisticated **Maximum Weighted Interval Scheduling (MWIS)** solution, extended to model both **resource conflicts** (venue usage) and **mandatory prerequisite dependencies** between events.  
+It serves as a strong demonstration of **advanced algorithms**, **object-oriented design**, and **performance optimization** in C++.
 
 ---
 
-## ⚙️ Core Algorithms
+## ✨ Features
 
-### 1. Graph Representation
-- Events are represented as nodes in a **Directed Acyclic Graph (DAG)**.  
-- Dependencies are modeled as directed edges (`A → B` means **A must happen before B**).  
+- **Multi-Objective Optimization**:  
+  Schedules events based on maximizing a weighted *Hybrid Score*, which combines **Revenue** and **Attendance**.  
+  Users can fine-tune the objective via an adjustable `α` parameter.
 
-This structure allows us to:
-- **Detect Cycles** → ensure no circular dependencies (invalid input).  
-- **Determine Order** → establish a valid scheduling order.  
+- **Venue Conflict Resolution**:  
+  Ensures no two selected events occupy the same venue simultaneously.
 
----
+- **Mandatory Dependencies**:  
+  Enforces prerequisite relationships between events (e.g., Event B cannot start until Event A is complete).
 
-### 2. Topological Sort
-We apply **Kahn’s Algorithm** to obtain a valid ordering of events.  
-This guarantees that every event is processed **after all its prerequisites**.  
+- **Constraint Validation**:  
+  Robust pre-processing checks to ensure data integrity before scheduling.
 
----
-
-### 3. Dynamic Programming
-The scheduler extends the classic **Weighted Interval Scheduling** algorithm.  
-
-For each event:
-- **Dependencies** → If an event is chosen, all its prerequisites are also included automatically.  
-- **Venue Conflicts** → Only one event per venue can occur at the same time; overlapping events in the same venue are excluded.  
-- **Objective Function** → Depending on the user’s choice, we maximize attendance, revenue, or a weighted hybrid score.
+- **Modular Architecture**:  
+  Implemented as a clean, encapsulated `DynamicScheduler` class using modern C++ principles.
 
 ---
 
-### 4. Hybrid Scoring (Multi-Objective Optimization)
-To balance attendance and revenue, we define a **hybrid objective**:
+## ⚙️ Algorithm and Complexity
 
-Score = α * normalizedAttendance + (1 – α) * normalizedRevenue
+The core of the scheduling engine relies on two integrated algorithms:
 
+### 1. Topological Sort (DAG Validation)
+- Models event dependencies as a **Directed Acyclic Graph (DAG)**.  
+- Verifies data integrity by detecting and preventing dependency cycles (e.g., A depends on B, which depends on A).  
+- Provides the necessary processing order for the dynamic programming stage.
 
-Where:
-- `α ∈ [0, 1]` is user-provided (e.g., `--alpha=0.7`).  
-- Normalization ensures attendance and revenue are scaled comparably (dividing each by the max value across events).  
-
-**Effect:**  
-- Higher `α` → prioritizes attendance.  
-- Lower `α` → prioritizes revenue.  
-
-This demonstrates **multi-objective optimization**, a strong point for algorithmic design.
+### 2. Dynamic Programming (DP) with `O(log N)` Optimization
+- Combines the traditional MWIS DP approach with **dependency path summation**.  
+- **Time Complexity:** Achieves optimal `O(N log N)` time complexity.  
+- **Venue Conflict Lookup:** Uses pre-sorted event lists and `std::upper_bound` for `O(log N)` lookups to efficiently find the best non-conflicting preceding event in the same venue.
 
 ---
 
-## 🚀 How to Compile and Run
+## 🛠️ Prerequisites
 
-### 1. Compilation
-Ensure you have a C++ compiler (e.g., `g++`). Run:
+To compile and run this C++ project, you need:
 
+- A **C++ compiler** that supports C++11 or later (e.g., GCC, Clang, MSVC).  
+- **Standard Template Library (STL)**.
+
+---
+
+## 🚀 How to Run
+
+### Step 1: Compile the Code
 ```bash
-g++ dynamic_scheduler.cpp -o scheduler
-````
+g++ dynamic_scheduler.cpp -o scheduler -std=c++17
+```
 
-### 2. Execution
-
-Run the program:
-````
+### Step 2: Execute the Program
+```bash
 ./scheduler
-````
+```
 
-You will be prompted to either:
+### Step 3: Follow the Prompts
+The application will guide you through:
+- Choosing between Manual Input or a Predefined Test Case.
+- Selecting the optimization Objective (Attendance, Revenue, or Hybrid Score).
+- If Hybrid is chosen, setting the α weight (0 to 1).
 
-Enter events manually, or
+---
 
-Run a predefined test case.
+## 💡 Future Enhancements
+To evolve this project into a production-ready system, the following features are planned:
 
-🧪 Test Case Analysis
-Test Input
-````
-events = {
-    {1, 1, 3, 100, 50, "Hall A", {}},
-    {2, 2, 4, 120, 60, "Hall A", {}},
-    {3, 5, 7, 150, 80, "Hall B", {}},
-    {4, 8, 9, 200, 100, "Hall B", {3}},
-    {5, 6, 8, 180, 90, "Hall A", {}},
-    {6, 9, 11, 220, 110, "Hall C", {1, 5}}
-};
-````
+### 1. Resource Constraints (RCPSP)
+Introduce granular resource modeling (e.g., staffing, equipment) with limited availability, transforming the problem into a Resource-Constrained Project Scheduling Problem.
 
-Expected Output (Maximize Attendance)
- Maximum Attendance achievable: 500
-Selected Events (by finish time):
-   ID 1 [1-3] Venue: Hall A | Attendance: 100 | Revenue: 50
-   ID 5 [6-8] Venue: Hall A | Attendance: 180 | Revenue: 90
-   ID 6 [9-11] Venue: Hall C | Attendance: 220 | Revenue: 110
----------------------------------------------------
- Totals -> Attendance: 500 | Revenue: 250
+### 2. External Data Handling
+Implement data input/output using external file formats (e.g., JSON) via a library like nlohmann/json.
 
-Reasoning
+### 3. Heuristic Solver
+Add an approximate solver (e.g., Genetic Algorithm) to handle NP-Hard extensions such as the RCPSP variant.
 
-Hall A Conflict:
-
-Event 1 [1–3] and Event 2 [2–4] overlap.
-
-While Event 2 has slightly higher attendance (120 vs 100), choosing Event 1 is better for unlocking downstream events.
-
-Dependency-Driven Optimization:
-
-Event 6 depends on both Event 1 and Event 5.
-
-By choosing Event 1, we can later schedule Event 5.
-
-Together, these unlock Event 6, which has very high attendance (220).
-
-Optimal Path:
-
-Events chosen: 1, 5, 6.
-
-Attendance = 100 + 180 + 220 = 500.
-
-Revenue = 50 + 90 + 110 = 250.
-
-Other paths (e.g., picking Event 2 or Event 3/4) result in lower total scores, so they are excluded.
-
-📊 Hybrid Example
-
-Suppose we run with α = 0.3 (focus on revenue):
-
-The scheduler will prefer higher-revenue events, even if attendance is slightly lower.
-
-With α = 0.8 (focus on attendance):
-
-The scheduler prioritizes high-attendance events, even at some revenue cost.
-
-✅ This flexibility makes the system useful in different real-world applications.
-
-
-✅ Key Takeaways
-
-Combines DAG-based dependency validation with Dynamic Programming.
-
-Handles multi-venue conflicts and dependency chains.
-
-Supports multi-objective optimization via hybrid scoring.
-
+### 4. Unit Testing
+Develop a comprehensive test suite (e.g., using Google Test) for core logic functions like topoSort() and calculateWeight().
